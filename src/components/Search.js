@@ -1,10 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import axios from 'axios';
 import { debounce } from 'lodash';
 import Suggestions from './Suggestions';
-
-const API_KEY = '157f34ed'; //Needs to be kept on server
-const API_URL = 'http://www.omdbapi.com/'
+import {searchMovie} from '../actions/movies'; 
 
 function Search(){
   const [query, setQuery] = useState('');
@@ -25,13 +22,9 @@ const getYear = (text) => {
 //Fetch data from the movie directory endpoint
   async function getInfo(text, pageNum){
     const year = getYear(text);
-    axios.get(`${API_URL}?apikey=${API_KEY}&type=movie&page=${pageNum}&y=${year}&s=${text.replace(year, '').trim()}`)
-      .then(({ data }) => {
-        if (data && data.Search && data.Search.length > 0) {
-        setResults(data.Search);
-        } else {
-          setResults([]);
-        }
+    searchMovie(text, pageNum, year)
+      .then((results) => {
+        setResults(results);
       })
       .catch(() => setError(true))
 }
